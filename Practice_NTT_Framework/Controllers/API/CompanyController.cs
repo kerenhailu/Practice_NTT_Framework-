@@ -15,32 +15,81 @@ namespace Practice_NTT_Framework.Controllers.API
         // GET: api/Company
         public IHttpActionResult Get()
         {
-            List<Company> ListEmployees = dataContext.Companys.ToList();
-            return Ok(new { ListEmployees });
+            List<Company> ListCompanys = dataContext.Companys.ToList();
+            return Ok(new { ListCompanys });
         }
 
         // GET: api/Company/5
         public async Task<IHttpActionResult> Get(int id)
         {
-            return Ok();
+
+            try
+            {
+                Company company = await dataContext.Companys.FindAsync(id);
+
+                //הישן
+                //Companys company  = dataContext.Companys.First((itemID) => itemID.Id == id);
+                return Ok(new { company });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: api/Company
-        public async Task<IHttpActionResult> Post([FromBody]string value)
+        public async Task<IHttpActionResult> Post([FromBody] Company company)
         {
-            return Ok();
+            try
+            {
+
+                dataContext.Companys.Add(company);
+                await dataContext.SaveChangesAsync();
+                return Ok("success");
+
+                //הדרך הישנה
+                //dataContext.Companys.Add(company);
+                //dataContext.SaveChanges();
+                //return Ok(new { company });
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
         }
 
         // PUT: api/Company/5
-        public async Task<IHttpActionResult> Put(int id, [FromBody]string value)
+        public async Task<IHttpActionResult> Put(int id, [FromBody]Company company)
         {
-            return Ok();
+            try
+            {
+                Company companyUser = dataContext.Companys.First((itemID) => itemID.Id == id);
+                companyUser.NameCompany = company.NameCompany;
+                companyUser.City = company.City;
+                dataContext.SaveChanges();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/Company/5
         public async Task<IHttpActionResult> Delete(int id)
         {
-            return Ok();
+            try
+            {
+                Company Company = dataContext.Companys.First((itemID) => itemID.Id == id);
+                dataContext.Companys.Remove(Company);
+                dataContext.SaveChanges();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
